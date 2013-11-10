@@ -10,6 +10,6 @@ Facebook Regional Hackathon 2013  (Midwest)
 
 #Tabify
 ==========
-Get synced guitar tabs and play along to your favorite songs!.
+Get syncronised guitar tabs and play along to your favorite songs!
 
 
