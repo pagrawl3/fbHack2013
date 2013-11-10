@@ -14,17 +14,21 @@
 
 /** alphaTab Design **/
 .alphaTabSurface {
-	border:7px solid rgb(210,214,215);
-	background:#F5F5F5;
+	/*border:7px solid rgb(210,214,215);*/
+	/*background:#F5F5F5;*/
 	/* Shadow */
-	-moz-box-shadow: 0 0 5px #888;
-	-webkit-box-shadow: 0 0 5px #888;
-	box-shadow: 0 0 5px #888;
+	/*-moz-box-shadow: 0 0 5px #888;*/
+	/*-webkit-box-shadow: 0 0 5px #888;*/
+	/*box-shadow: 0 0 5px #888;*/
 	/* Radius */
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	margin:7px 7px;
+	/*-moz-border-radius: 5px;*/
+	/*-webkit-border-radius: 5px;*/
+	/*border-radius: 5px;*/
+	margin: 0 auto;
+	display: block;
+	z-index: 5;
+	position: relative;
+
 
 }
 
@@ -33,6 +37,7 @@
 	it enables to get newline symbols from div **/
 .alphaTab {
 	white-space:pre;	
+	margin: 0 auto;
 }
 
 /** Styling the code editor */
@@ -50,4 +55,18 @@
 	width:500px;
 	height:auto!;
 	margin:7px 7px;
+}
+
+.highlighter {
+	z-index: 0;
+	position: absolute;
+	top: 220px;
+	width: 100%;
+	height: 120px;
+	background: #FFF;
+	-webkit-transition: 0.2s ease-out;
+	-moz-transition: 0.2s ease-out;
+	-ms-transition: 0.2s ease-out;
+	-o-transition: 0.2s ease-out;
+	transition: 0.2s ease-out;
 }

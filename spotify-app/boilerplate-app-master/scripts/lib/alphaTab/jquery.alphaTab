@@ -21,8 +21,8 @@ var alphaTabWrapper;
  */
 (function($)
 {
-	
-	
+    
+    
     alphaTabWrapper = function(el, options)
     {
         //
@@ -32,51 +32,51 @@ var alphaTabWrapper;
         var el = $(el);
         this.el = el;
         this.factory = new alphatab.tablature.model.DrawingSongModelFactory();
-		
-		// resolve absolute script path
-		var alphaTabTag = $('script[src*="/alphaTab.js"]');
-		if(alphaTabTag.length == 0) // also try min-version
-			alphaTabTag = $('script[src*="/alphaTab.min.js"]');
+        
+        // resolve absolute script path
+        var alphaTabTag = $('script[src*="/alphaTab.js"]');
+        if(alphaTabTag.length == 0) // also try min-version
+            alphaTabTag = $('script[src*="/alphaTab.min.js"]');
 
-		var alphaTabBase = "";
-		if(alphaTabTag.length)
-		{
-			var toAbsURL = function(s) 
-			{
-				var l = location, h, p, f, i;
-				if (/^\w+:/.test(s)) 
-				{
-					return s;
-				}
+        var alphaTabBase = "";
+        if(alphaTabTag.length)
+        {
+            var toAbsURL = function(s) 
+            {
+                var l = location, h, p, f, i;
+                if (/^\w+:/.test(s)) 
+                {
+                    return s;
+                }
 
-				h = l.protocol + '//' + l.host;
-				if (s.indexOf('/') == 0) 
-				{
-					return h + s;
-				}
+                h = l.protocol + '//' + l.host;
+                if (s.indexOf('/') == 0) 
+                {
+                    return h + s;
+                }
 
-				p = l.pathname.replace(/\/[^\/]*$/, '');
-				f = s.match(/\.\.\//g);
-				if (f) 
-				{
-					s = s.substring(f.length * 3);
-					for (i = f.length; i--;)
-					{
-						p = p.substring(0, p.lastIndexOf('/'));
-					}
-				}
+                p = l.pathname.replace(/\/[^\/]*$/, '');
+                f = s.match(/\.\.\//g);
+                if (f) 
+                {
+                    s = s.substring(f.length * 3);
+                    for (i = f.length; i--;)
+                    {
+                        p = p.substring(0, p.lastIndexOf('/'));
+                    }
+                }
 
-				return h + p + '/' + s;
-			}
-			alphaTabBase = toAbsURL(alphaTabTag.attr('src'));
-			alphaTabBase = alphaTabBase.substr(0, alphaTabBase.lastIndexOf('/'));
-		}
-		
+                return h + p + '/' + s;
+            }
+            alphaTabBase = toAbsURL(alphaTabTag.attr('src'));
+            alphaTabBase = alphaTabBase.substr(0, alphaTabBase.lastIndexOf('/'));
+        }
+        
         var defaults =
         {
-			// core
-			base: alphaTabBase,
-			
+            // core
+            base: alphaTabBase,
+            
             // initial file loading
             file: null,
             track: 0,
@@ -93,7 +93,7 @@ var alphaTabWrapper;
             autoSize: true,
             staves: null,
             layout: null,
-			context: "canvas"
+            context: "canvas"
         };
 
         this.options = $.extend(defaults, options);
@@ -108,35 +108,35 @@ var alphaTabWrapper;
         // loading
         this.loadAlphaTex = function(tex)
         {
-			try
-			{
+            try
+            {
                 self.tablature.isError = false;
 
                 // create parser and reader
-				var parser = new alphatab.file.alphatex.AlphaTexParser();
-				var reader = new alphatab.io.StringInputStream(tex);
-				parser.init(reader, self.factory);
+                var parser = new alphatab.file.alphatex.AlphaTexParser();
+                var reader = new alphatab.io.StringInputStream(tex);
+                parser.init(reader, self.factory);
                 var song = parser.readSong();
                 alphatab.file.SongReader.finalize(song);
                 // read song
-				songLoaded(song);
-			}
-			catch(e)
-			{
+                songLoaded(song);
+            }
+            catch(e)
+            {
                 updateError(e);
-			}
+            }
         }
 
         this.loadFile = function(url)
         {
             try
-			{
-				alphatab.file.SongLoader.loadSong(url, self.factory, songLoaded);
-			}
-			catch(e)
-			{
+            {
+                alphatab.file.SongLoader.loadSong(url, self.factory, songLoaded);
+            }
+            catch(e)
+            {
                 updateError(e);
-			}
+            }
         }
 
         // plugin callbacks on load
@@ -151,14 +151,14 @@ var alphaTabWrapper;
             if(self.options.loadCallback)
                 self.options.loadCallback(song);
             // update tablature
-			try
-			{
-				self.tablature.setTrack(song.tracks[self.options.track]);
-			}
-			catch( e )
-			{
-				alert(e);
-			}
+            try
+            {
+                self.tablature.setTrack(song.tracks[self.options.track]);
+            }
+            catch( e )
+            {
+                alert(e);
+            }
             // additional plugin callbacks
             for(var i = 0; i < self.loadCallbacks.length; i++)
             {
@@ -185,73 +185,73 @@ var alphaTabWrapper;
             }
         }
 
-		var createCanvas = function() {
-			// create canvas
-			// HACK: call createElement('canvas') once before. this ensures that the browser knows the element
-			document.createElement('canvas'); 
-			self.canvas = $('<canvas width="'+self.options.width+'" height="'+self.options.height+'" class="alphaTabSurface"></canvas>');
-			self.el.append(self.canvas);
-			self.canvas = self.canvas[0];
-			if($.browser.msie) 
-			{
-				// Excanvas initialization
-				if($.browser.version < 9)
-				{
-					var fixElement_ = function(el) 
-					{
-					   // in IE before version 5.5 we would need to add HTML: to the tag name
-					   // but we do not care about IE before version 6
-					   var outerHTML = el.outerHTML;
-					 
-					   var newEl = el.ownerDocument.createElement(outerHTML);
-					   // if the tag is still open IE has created the children as siblings and
-					   // it has also created a tag with the name "/FOO"
-					   if (outerHTML.slice(-2) != "/>") {
-							 var tagName = "/" + el.tagName;
-							 var ns;
-							 // remove content
-							 while ((ns = el.nextSibling) && ns.tagName != tagName) {
-							   ns.removeNode();
-							 }
-							 // remove the incorrect closing tag
-							 if (ns) {
-							   ns.removeNode();
-							 }
-					   }
-					   el.parentNode.replaceChild(newEl, el);
-					   return newEl;
-					};
-					
-					self.canvas = G_vmlCanvasManager.initElement(fixElement_(self.canvas));
-				}
-			}
-			
+        var createCanvas = function() {
+            // create canvas
+            // HACK: call createElement('canvas') once before. this ensures that the browser knows the element
+            document.createElement('canvas'); 
+            self.canvas = $('<canvas width="'+self.options.width+'" height="'+self.options.height+'" class="alphaTabSurface"></canvas>');
+            self.el.append(self.canvas);
+            self.canvas = self.canvas[0];
+            if($.browser.msie) 
+            {
+                // Excanvas initialization
+                if($.browser.version < 9)
+                {
+                    var fixElement_ = function(el) 
+                    {
+                       // in IE before version 5.5 we would need to add HTML: to the tag name
+                       // but we do not care about IE before version 6
+                       var outerHTML = el.outerHTML;
+                     
+                       var newEl = el.ownerDocument.createElement(outerHTML);
+                       // if the tag is still open IE has created the children as siblings and
+                       // it has also created a tag with the name "/FOO"
+                       if (outerHTML.slice(-2) != "/>") {
+                             var tagName = "/" + el.tagName;
+                             var ns;
+                             // remove content
+                             while ((ns = el.nextSibling) && ns.tagName != tagName) {
+                               ns.removeNode();
+                             }
+                             // remove the incorrect closing tag
+                             if (ns) {
+                               ns.removeNode();
+                             }
+                       }
+                       el.parentNode.replaceChild(newEl, el);
+                       return newEl;
+                    };
+                    
+                    self.canvas = G_vmlCanvasManager.initElement(fixElement_(self.canvas));
+                }
+            }
+            
             self.canvasWrapper = self.canvas;
-			return self.canvas;
-		}
+            return self.canvas;
+        }
         
         var createCanvasWrapper = function() {
             self.canvasWrapper = $('<div class="alphaTabCanvasWrapper"></div>');
             self.canvas = self.canvasWrapper;
             self.el.append(self.canvasWrapper);               
         }
-		
+        
         //
         // startup
         //
         
         this.contents = $.trim(el.text());
-		el.html('');
-		
-		// create context
-		var contextObject = null;
- 		if(this.options.context == "canvas") {
-			contextObject = createCanvas();
-		}
-		else {
+        el.html('');
+        
+        // create context
+        var contextObject = null;
+        if(this.options.context == "canvas") {
+            contextObject = createCanvas();
+        }
+        else {
             createCanvasWrapper();
-			contextObject = this.options.context;
-		}	
+            contextObject = this.options.context;
+        }   
         
         // prepare, stave configuration
         var staves = null;
@@ -315,22 +315,22 @@ var alphaTabWrapper;
                 });
             });
         }
-		
-		if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS) {
-			this.tablature.onFinished = function() {
-				self.canvasWrapper.children().remove(); // remove old svg 
-				var canvas = self.tablature.canvas;
-				var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
+        
+        if(this.options.context == alphatab.platform.PlatformFactory.SVG_CANVAS) {
+            this.tablature.onFinished = function() {
+                self.canvasWrapper.children().remove(); // remove old svg 
+                var canvas = self.tablature.canvas;
+                var svgElement = $(canvas.toSvg(true, "alphaTabSurface"));
                 self.canvas = svgElement;
-				self.canvasWrapper.append(svgElement);
-			}
-		}
+                self.canvasWrapper.append(svgElement);
+            }
+        }
         
         // load data
         if(this.options.file)
         {
-			this.loadFile(this.options.file);
-		}
+            this.loadFile(this.options.file);
+        }
         else if(this.contents != "")
         {
             this.loadAlphaTex(this.contents);
@@ -352,16 +352,16 @@ var alphaTabWrapper;
     //
     $.fn.alphaTab = function(options)
     {
-		var ret = [];
-		for(var i=0; i<this.length; i++)
+        var ret = [];
+        for(var i=0; i<this.length; i++)
         {
-			if(!this[i].alphaTab)
+            if(!this[i].alphaTab)
             {
-				this[i].alphaTab = new alphaTabWrapper(this[i], options);
-			}
-			ret.push(this[i].alphaTab);
-		}
-		return ret.length > 1 ? ret : ret[0];
+                this[i].alphaTab = new alphaTabWrapper(this[i], options);
+            }
+            ret.push(this[i].alphaTab);
+        }
+        return ret.length > 1 ? ret : ret[0];
     }
 })(jQuery);
 
@@ -376,29 +376,29 @@ var alphaTabWrapper;
  */           
 document.write('<script type="text/vbscript">\n\
 Function VbAjaxLoader(method, fileName)\n\
-	Dim xhr\n\
-	Set xhr = CreateObject("Microsoft.XMLHTTP")\n\
+    Dim xhr\n\
+    Set xhr = CreateObject("Microsoft.XMLHTTP")\n\
 \n\
-	xhr.Open method, fileName, False\n\
+    xhr.Open method, fileName, False\n\
 \n\
-	xhr.setRequestHeader "Accept-Charset", "x-user-defined"\n\
-	xhr.send\n\
+    xhr.setRequestHeader "Accept-Charset", "x-user-defined"\n\
+    xhr.send\n\
 \n\
-	Dim byteArray()\n\
+    Dim byteArray()\n\
 \n\
-	if xhr.Status = 200 Then\n\
-		Dim byteString\n\
-		Dim i\n\
+    if xhr.Status = 200 Then\n\
+        Dim byteString\n\
+        Dim i\n\
 \n\
-		byteString=xhr.responseBody\n\
+        byteString=xhr.responseBody\n\
 \n\
-		ReDim byteArray(LenB(byteString))\n\
+        ReDim byteArray(LenB(byteString))\n\
 \n\
-		For i = 1 To LenB(byteString)\n\
-			byteArray(i-1) = AscB(MidB(byteString, i, 1))\n\
-		Next\n\
-	End If\n\
+        For i = 1 To LenB(byteString)\n\
+            byteArray(i-1) = AscB(MidB(byteString, i, 1))\n\
+        Next\n\
+    End If\n\
 \n\
-	VbAjaxLoader=byteArray\n\
+    VbAjaxLoader=byteArray\n\
 End Function\n\
 </script>');

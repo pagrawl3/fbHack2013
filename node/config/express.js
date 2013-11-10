@@ -13,6 +13,21 @@ module.exports = function (params) {
 		level: 9
 	}));
 
+	var allowCrossDomain = function(req, res, next) {
+	    res.header('Access-Control-Allow-Origin', '*');
+	    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+	    // intercept OPTIONS method
+	    if ('OPTIONS' == req.method) {
+	      res.send(200);
+	    }
+	    else {
+	      next();
+	    }
+	};
+
+
 	//Use the default favicon
 	app.use(express.favicon())
 	//Setup the public serving directory
@@ -39,5 +54,6 @@ module.exports = function (params) {
 
 		//Use the router -- EXPLICITLY DEFINED AT THE END (Can be implicit -- Why?)
 		app.use(app.router)
+		app.use(allowCrossDomain);
 	})
 }

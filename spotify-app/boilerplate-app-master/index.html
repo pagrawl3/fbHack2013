@@ -15,25 +15,142 @@
     <link rel="stylesheet" href="css/alphaTab.css">
 
     <script language="JavaScript" type="text/javascript" src="scripts/lib/jquery/jquery.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/lib/alphaTab/alphaTab.min.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/lib/alphaTab/jquery.alphaTab.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="scripts/lib/alphaTab/alphaTab.js"></script>
+    <script language="JavaScript" type="text/javascript" src="scripts/lib/alphaTab/jquery.alphaTab.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
   </head>
 
-  <body>
-    <h1>Hello World!</h1>
-    <script src="scripts/main.js"></script>
-    
-    <p>This sample shows how to display a GuitarPro file</p>
-             
+  <body>     
     <script language="JavaScript" type="text/javascript"> 
         $(document).ready(function() { 
-            $('div.alphaTab').alphaTab({file: 'scripts/tab.gp4'});
+            require([
+              '$api/models',
+
+            ], function(models, languageExample, coverExample, buttonExample, playlistExample) {
+              'use strict';
+                models.player.load('track').done(updateCurrentTrack);
+                models.player.addEventListener('change', updateCurrentTrack);
+
+                function updateCurrentTrack() {
+                    console.log(models.player.position)
+                    console.log(models.player.track) //the track file
+                    //we do the node search here to get the gp file
+
+                    var url = "http://localhost:3000/search/"+models.player.track.artists[0].name+'/'+models.player.track.name
+
+                    $.get(url, function(data) {
+                        trackLoad(data, models)
+                    });
+
+                }
+            });
+
+            function trackLoad(data, models) {
+                var file = 'tabs/'+models.player.track.artists[0].name.split(" ").join("_")+'-'+models.player.track.name.split(" ").join("_")
+
+                var api = $('div.alphaTab').alphaTab({
+                    file            : file,
+                    layout: {
+                        // mode: "horizontal",
+                        measuresPerLine: 2,
+                        // measureCount: 4,
+                        // hideSongInfo: true
+                    },
+                    staves: ["tablature"],
+                    loadCallback    : function(song) {
+                        console.log('here');
+                        var tracks = $('#Tracks');
+                        tracks.find('option').remove();
+                        for (var i = 0; i < song.tracks.length; i++) {
+                            var elm = $('<option value="'+i+'">'+song.tracks[i].name+'</option>');
+                            if(i == 0) {
+                                elm.attr("selected", "selected");
+                            }   
+                            tracks.append(elm);
+                        }
+                    }
+                });
+
+                // $('div.alphaTab').alphaTab({file: 'scripts/myfile', layout: {
+                //             mode: "page",
+                //             measuresPerLine: 5,
+                //             startMeasure: 5,
+                //             measureCount: 5
+                // }});
+
+                $('#UpdateTrack').click(function() { 
+                    var index = parseInt($('#Tracks :selected').val());
+                    api.tablature.setTrack(api.tablature.track.song.tracks[index]);
+                });
+
+                var timings = [0,200,500,700,900,1000,1300,1500,1800,2999, 3200, 3400, 3900, 5000];
+                var index = 0;
+                var timeouts = [];
+
+                // window.setTimeout(function(){
+                //     console.log('READJUSTING')
+                //     readjust(0)
+                // }, 2000)
+
+                // mover(0);
+                
+                function mover(init) {
+                    for (var i=init; i<timings.length; i=i+2)
+                        doSetTimeout(i)
+                }
+
+                function moveDown(num) {
+                    console.log('moving down');
+                    var top     = 220,
+                        height  = 132,
+                        new_top = top + (height*num);
+                    $('.highlighter').css('top',new_top+'px');
+                }
+
+                function doSetTimeout(i) {
+                    var pushed_val = window.setTimeout(function(){
+                                        console.log(i); moveDown(Math.floor((i)/2));
+                                        $('html,body').animate({scrollTop: (i)*66}, 'slow');
+                                    }, timings[i]+timings[i+1]);
+                    timeouts.push(pushed_val);
+                    console.log(timeouts);
+                }
+
+                function readjust(curr_time) {
+                    var total = 0,
+                        found = false;
+                    for (var i=0; i<timings.length && !found; i=i+2) {
+                        total += timings[i] + timings[i+1];
+                        console.log('total: ', total);
+                        if (total > curr_time) {
+                            console.log('found');
+                            found = true;
+                            index = (i);
+                            clearer(timeouts);
+                            timeouts = [];
+                            mover(index);
+                        }
+                    }
+                }
+
+                function clearer(timeouts_local) {
+                    for (var z=0; z<timeouts_local.length; z++) {
+                        clearTimeout(timeouts_local[z]);
+                    }
+                }
+            }
+
         });
     </script>
     
+    <label for="Tracks">Tracks:</label>
+    <select id="Tracks">
+    </select>
+    <input id="UpdateTrack" type="button" value="Show" />
+
+    <div class="highlighter"></div>
     <div class="alphaTab"></div>
 
-  </body>
+    </body>
 </html>
