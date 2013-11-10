@@ -55,18 +55,38 @@
 	width:500px;
 	height:auto!;
 	margin:7px 7px;
+	-webkit-transition: 0.2s ease-out;
+	-moz-transition: 0.2s ease-out;
+	-ms-transition: 0.2s ease-out;
+	-o-transition: 0.2s ease-out;
+	transition: 0.2s ease-out;
+	opacity: 0;
+	padding-top: 400px;
 }
 
 .highlighter {
+	opacity: 0;
 	z-index: 0;
 	position: absolute;
-	top: 220px;
+	top: 0px;
 	width: 100%;
-	height: 120px;
+	height: 180px;
 	background: #FFF;
 	-webkit-transition: 0.2s ease-out;
 	-moz-transition: 0.2s ease-out;
 	-ms-transition: 0.2s ease-out;
 	-o-transition: 0.2s ease-out;
 	transition: 0.2s ease-out;
+}
+
+.select {
+	z-index: 900;
+	position: fixed;
+	margin: 0px auto;
+	display: block;
+	text-align: center;
+	width: 100%;
+	background-color: #333;
+	padding: 30px;
+	color: white;
 }

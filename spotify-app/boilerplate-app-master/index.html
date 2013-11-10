@@ -30,7 +30,7 @@
             ], function(models, languageExample, coverExample, buttonExample, playlistExample) {
               'use strict';
                 models.player.load('track').done(updateCurrentTrack);
-                models.player.addEventListener('change', updateCurrentTrack);
+                // models.player.addEventListener('change', updateCurrentTrack);
 
                 function updateCurrentTrack() {
                     console.log(models.player.position)
@@ -44,6 +44,8 @@
                     });
 
                 }
+
+                updateCurrentTrack();
             });
 
             function trackLoad(data, models) {
@@ -69,6 +71,14 @@
                             }   
                             tracks.append(elm);
                         }
+
+                        window.setTimeout(function() {
+                            $('.alphaTexEditor').css('opacity', '1');
+                            $('.highlighter').css('opacity', '1');
+
+                            models.player.seek(0);
+                            models.player.play();
+                        }, 500);
                     }
                 });
 
@@ -84,70 +94,109 @@
                     api.tablature.setTrack(api.tablature.track.song.tracks[index]);
                 });
 
-                var timings = [0,200,500,700,900,1000,1300,1500,1800,2999, 3200, 3400, 3900, 5000];
-                var index = 0;
-                var timeouts = [];
-
-                // window.setTimeout(function(){
-                //     console.log('READJUSTING')
-                //     readjust(0)
-                // }, 2000)
-
-                // mover(0);
-                
-                function mover(init) {
-                    for (var i=init; i<timings.length; i=i+2)
-                        doSetTimeout(i)
-                }
-
-                function moveDown(num) {
-                    console.log('moving down');
-                    var top     = 220,
-                        height  = 132,
-                        new_top = top + (height*num);
-                    $('.highlighter').css('top',new_top+'px');
-                }
-
-                function doSetTimeout(i) {
-                    var pushed_val = window.setTimeout(function(){
-                                        console.log(i); moveDown(Math.floor((i)/2));
-                                        $('html,body').animate({scrollTop: (i)*66}, 'slow');
-                                    }, timings[i]+timings[i+1]);
-                    timeouts.push(pushed_val);
-                    console.log(timeouts);
-                }
-
-                function readjust(curr_time) {
-                    var total = 0,
-                        found = false;
-                    for (var i=0; i<timings.length && !found; i=i+2) {
-                        total += timings[i] + timings[i+1];
-                        console.log('total: ', total);
-                        if (total > curr_time) {
-                            console.log('found');
-                            found = true;
-                            index = (i);
-                            clearer(timeouts);
-                            timeouts = [];
-                            mover(index);
+                $.get('tabs/'+models.player.track.artists[0].name.split(" ").join("_")+'-'+models.player.track.name.split(" ").join("_")+'.json', function(data) {
+                   
+                   var timings = [0];
+                   var timing_count = 0;
+                        
+                    // use SongLoader to load files
+                    var factory = new alphatab.tablature.model.DrawingSongModelFactory();
+                    alphatab.file.SongLoader.loadSong('tabs/'+models.player.track.artists[0].name.split(" ").join("_")+'-'+models.player.track.name.split(" ").join("_"), factory, 
+                    function(song){ 
+                        console.log(song);
+                        var hard_coded = {
+                            '2' : 120,
+                            '4' : 60,
+                            '8' : 30,
+                            '16': 15
                         }
-                    }
-                }
+                        var total = 0;
+                        for (var x=0; x<song.measureHeaders.length; x++) {
+                            var duration = ( song.measureHeaders[x].timeSignature.numerator * hard_coded[song.measureHeaders[x].timeSignature.denominator.value] / song.tempo )
+                            total += duration
+                            timings.push(total*1000);
+                        }
 
-                function clearer(timeouts_local) {
-                    for (var z=0; z<timeouts_local.length; z++) {
-                        clearTimeout(timeouts_local[z]);
-                    }
-                }
+                        // var total = 0;
+                        // for (var x=0; x<data.length; x++) {
+                        //      total += data[x].duration
+                        //      timings.push(total*1000);
+                        // }                        
+
+                        console.log('Timings', timings);
+                        var index = 0;
+                        var timeouts = [];
+
+                        // window.setTimeout(function(){
+                        //     console.log('READJUSTING')
+                        //     readjust(0)
+                        // }, 2000)
+                         clearer(timeouts);
+                         mover(0);
+                        
+                        function mover(init) {
+                            for (var i=init; i<timings.length; i=i+2) {
+                                 console.log('i = ', i);
+                                doSetTimeout(i)
+                            }
+                        }
+
+                        function moveDown(num) {
+                            console.log('moving down');
+                            var top     = 160,
+                                height  = 132,
+                                new_top = top + (height*num);
+                            $('.highlighter').css('top',new_top+'px');
+                        }
+
+                        function doSetTimeout(j) {
+
+                            var delay = timings[j];
+                            var pushed_val = window.setTimeout(function(){
+                                                console.log(j); moveDown(Math.floor((j)/2));
+                                                $('html,body').animate({scrollTop: (j)*66}, 'slow');
+                                            }, delay);
+                            timeouts.push(pushed_val);
+                            console.log(timeouts);
+                        }
+
+                        function readjust(curr_time) {
+                            var total = 0,
+                                found = false;
+                            for (var i=0; i<timings.length && !found; i=i+2) {
+                                total += timings[i] + timings[i+1];
+                                console.log('total: ', total);
+                                if (total > curr_time) {
+                                    console.log('found');
+                                    found = true;
+                                    index = (i);
+                                    clearer(timeouts);
+                                    timeouts = [];
+                                    mover(index);
+                                }
+                            }
+                        }
+
+                        function clearer(timeouts_local) {
+                            for (var z=0; z<timeouts_local.length; z++) {
+                                clearTimeout(timeouts_local[z]);
+                            }
+                        }                             
+                    });
+
+                })
+                
             }
 
         });
     </script>
     
-    <label for="Tracks">Tracks:</label>
-    <select id="Tracks">
-    </select>
-    <input id="UpdateTrack" type="button" value="Show" />
+    <div class="select">
+        <label for="Tracks">Tracks:</label>
+        <select id="Tracks">
+        </select>
+        <input id="UpdateTrack" type="button" value="Show" />
+    </div>
 
     <div class="highlighter"></div>
     <div class="alphaTab"></div>
