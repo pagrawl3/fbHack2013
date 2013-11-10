@@ -38,7 +38,8 @@
   },
   "RequiredPermissions": [
     "https://api.mygreatapp.com",
-    "http://localhost"
+    "http://localhost",
+    "http://googleapis.com"
   ],
   "SupportedDeviceClasses": [
     "Web",
