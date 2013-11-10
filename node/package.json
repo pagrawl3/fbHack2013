@@ -6,6 +6,8 @@
 		"express" : "3.x",
 		"jade"	  : "*",
 		"mongoose": "*",
-		"connect" : "*"
+		"connect" : "*",
+		"request" : "*",
+		"cheerio" : "*"
 	}
 }
