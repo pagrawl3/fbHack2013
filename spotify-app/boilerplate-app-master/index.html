@@ -23,16 +23,36 @@
 
   <body>     
     <script language="JavaScript" type="text/javascript"> 
+        var timeouts = [];
+        function Timer(callback, delay) {
+            var timerId, start, remaining = delay;
+
+            this.pause = function() {
+                window.clearTimeout(timerId);
+                remaining -= new Date() - start;
+            };
+
+            this.resume = function() {
+                start = new Date();
+                timerId = window.setTimeout(callback, remaining);
+            };
+
+            this.resume();
+        }
+        
         $(document).ready(function() { 
+
+
             require([
               '$api/models',
 
             ], function(models, languageExample, coverExample, buttonExample, playlistExample) {
               'use strict';
                 models.player.load('track').done(updateCurrentTrack);
-                // models.player.addEventListener('change', updateCurrentTrack);
+                models.player.addEventListener('change', refresher);
 
                 function updateCurrentTrack() {
+                    models.player.pause();
                     console.log(models.player.position)
                     console.log(models.player.track) //the track file
                     //we do the node search here to get the gp file
@@ -43,6 +63,23 @@
                         trackLoad(data, models)
                     });
 
+                }
+
+                function refresher() {
+                    console.log("STATE CHANGED");
+                    if(!models.player.playing) {
+                        $('body').css('backgroundColor', '#FFF');
+                        timeouts.forEach(function(element, index) {
+                            element.pause();
+                        })
+                    }
+                    else {
+                        $('body').css('backgroundColor', 'rgba(1,1,1,0)');
+                        timeouts.forEach(function(element, index) {
+                            element.resume();
+                        })
+                        // updateCurrentTrack();
+                    }
                 }
 
                 updateCurrentTrack();
@@ -125,7 +162,7 @@
 
                         console.log('Timings', timings);
                         var index = 0;
-                        var timeouts = [];
+                        // var timeouts = [];
 
                         // window.setTimeout(function(){
                         //     console.log('READJUSTING')
@@ -152,10 +189,15 @@
                         function doSetTimeout(j) {
 
                             var delay = timings[j];
-                            var pushed_val = window.setTimeout(function(){
-                                                console.log(j); moveDown(Math.floor((j)/2));
-                                                $('html,body').animate({scrollTop: (j)*66}, 'slow');
-                                            }, delay);
+                            // var pushed_val = window.setTimeout(function(){
+                            //                     console.log(j); moveDown(Math.floor((j)/2));
+                            //                     $('html,body').animate({scrollTop: (j)*66}, 'slow');
+                            //                 }, delay+200);
+
+                            var pushed_val = new Timer(function() {
+                                moveDown(Math.floor((j)/2));
+                                $('html,body').animate({scrollTop: (j)*66}, 'slow');
+                            }, delay+200);
                             timeouts.push(pushed_val);
                             console.log(timeouts);
                         }
@@ -178,8 +220,12 @@
                         }
 
                         function clearer(timeouts_local) {
-                            for (var z=0; z<timeouts_local.length; z++) {
-                                clearTimeout(timeouts_local[z]);
+                            console.log('inside clearer');
+                            var tim = timeouts;
+                            if (timeouts_local)
+                                tim = timeouts_local;
+                            for (var z=0; z<tim.length; z++) {
+                                clearTimeout(tim[z]);
                             }
                         }                             
                     });
@@ -192,6 +238,7 @@
     </script>
     
     <div class="select">
+
         <label for="Tracks">Tracks:</label>
         <select id="Tracks">
         </select>
