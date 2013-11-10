@@ -4,9 +4,10 @@
 Facebook Regional Hackathon 2013  (Midwest)
 
 ##Team:-
-*Pratham Agrawal
-*Shivam Kejriwal
-*Naveen Arivazhagan
+
+* Pratham Agrawal
+* Shivam Kejriwal
+* Naveen Arivazhagan
 
 #Tabify
 ==========
