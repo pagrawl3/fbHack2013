@@ -7,7 +7,7 @@ Facebook Regional Hackathon 2013  (Midwest)
 
 * Pratham Agrawal
 * Shivam Kejriwal
-* Naveen Arivazhagan
+* Tushar Bhushan
 
 #Tabify
 ==========
